@@ -13,8 +13,8 @@ library(purrr)
 source("/home/additional_ineq_functions.R")
 
 
-benchmark_iterations <- 6 # change to 30 or 100
-bootstrap_n <- 10 # change to 1000
+benchmark_iterations <- 40 # change to 30 or 100
+bootstrap_n <- 1000 # change to 1000
 
 df_raw <- haven::read_dta("/home/data/it14ih.dta")
 
