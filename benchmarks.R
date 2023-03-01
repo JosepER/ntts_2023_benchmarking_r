@@ -13,7 +13,7 @@ library(purrr)
 source("/home/additional_ineq_functions.R")
 
 
-benchmark_iterations <- 40 # change to 30 or 100
+benchmark_iterations <- 50 # change to a value between 30 and 100
 bootstrap_n <- 1000 # change to 1000
 
 df_raw <- haven::read_dta("/home/data/it14ih.dta")
@@ -31,54 +31,63 @@ print("Starting simple benchmarks")
 
 # gini
 benchmark_gini <- bench::mark(benchmark_gini = dineq::gini.wtd(df$dhi, df$hwgt),
-    iterations=benchmark_iterations)
+    iterations=benchmark_iterations,
+    time_unit="ns")
 
 # atkinson with ϵ > 1
 benchmark_atkinson_large_e <- bench::mark(benchmark_atkinson_large_e = wINEQ::Atkinson(df$dhi, 
     df$hwgt,
     e = 1.2),
-    iterations=benchmark_iterations)
+    iterations=benchmark_iterations,
+    time_unit="ns")
 
 # atkinson with ϵ < 1
 benchmark_atkinson_small_e <- bench::mark(benchmark_atkinson_small_e = wINEQ::Atkinson(df$dhi, 
     df$hwgt,
     e = 0.8),
-    iterations=benchmark_iterations)
+    iterations=benchmark_iterations,
+    time_unit="ns")
 
 # Fgt
 benchmark_fgt <- bench::mark(benchmark_fgt = poverty_fgt(df$dhi,
     wtd.quantile(df$dhi, df$hwgt, 0.5) * 0.6,
     df$hwgt,
     alpha = 0.8),
-    iterations=benchmark_iterations)
+    iterations=benchmark_iterations,
+    time_unit="ns")
 
 # headcount
 benchmark_headcount <- bench::mark(benchmark_headcount = headcount(v = df$dhi, 
     z = wtd.quantile(df$dhi, df$hwgt, 0.5) * 0.6,
     w = df$hwgt),
-    iterations=benchmark_iterations)
+    iterations=benchmark_iterations,
+    time_unit="ns")
 
 # poverty gap
 benchmark_poverty_gap <- bench::mark(benchmark_poverty_gap = poverty_gap(v = df$dhi, 
     z = wtd.quantile(df$dhi, df$hwgt, 0.5) * 0.6,
     w = df$hwgt),
-    iterations=benchmark_iterations)
+    iterations=benchmark_iterations,
+    time_unit="ns")
 
 # watts
 benchmark_watts <- bench::mark(benchmark_watts = watts(df$dhi,
                                     alpha = wtd.quantile(df$dhi, df$hwgt, 0.5) * 0.6,
                                         df$hwgt),
-                                iterations = benchmark_iterations)
+                                iterations = benchmark_iterations,
+    time_unit="ns")
 
 # theil
 benchmark_theil <- bench::mark(benchmark_theil = dineq::theil.wtd(df$dhi,
                                         df$hwgt),
-                                iterations = benchmark_iterations)
+                                iterations = benchmark_iterations,
+    time_unit="ns")
 
 # mld
 benchmark_mld <- bench::mark(benchmark_mld = dineq::mld.wtd(df$dhi,
                                         df$hwgt),
-                              iterations = benchmark_iterations)
+                              iterations = benchmark_iterations,
+    time_unit="ns")
 
 
 # Estimates with bootstrap ------------------------------------------------
@@ -89,18 +98,21 @@ print("Bootstrap Gini")
 # gini
 benchmark_bootstrap_gini <- bench::mark(benchmark_bootstrap_gini = bootstrap(df, bootstrap_n) %>%
     purrr::map_dbl(~gini.wtd(.x$dhi, .x$hwgt)),
-                              iterations = benchmark_iterations)
+                              iterations = benchmark_iterations,
+    time_unit="ns")
 
 print("Bootstrap Atkinsons")
 # atkinson with ϵ > 1
 benchmark_bootstrap_atkinson_large_e <- bench::mark(benchmark_bootstrap_atkinson_large_e = bootstrap(df, bootstrap_n) %>%
     purrr::map_dbl(~wINEQ::Atkinson(.x$dhi, .x$hwgt, e = 1.2)),
-                              iterations = benchmark_iterations)
+                              iterations = benchmark_iterations,
+    time_unit="ns")
 
 # atkinson with ϵ < 1
 benchmark_bootstrap_atkinson_small_e <- bench::mark(benchmark_bootstrap_atkinson_small_e = bootstrap(df, bootstrap_n) %>%
     purrr::map_dbl(~wINEQ::Atkinson(.x$dhi, .x$hwgt, e = 0.8)),
-    iterations=benchmark_iterations)
+                                iterations=benchmark_iterations,
+    time_unit="ns")
 
 print("Bootstrap FGT")
 # Fgt
@@ -109,7 +121,8 @@ benchmark_bootstrap_fgt <- bench::mark(benchmark_bootstrap_fgt = bootstrap(df, b
         wtd.quantile(df$dhi, df$hwgt, 0.5) * 0.6,
         df$hwgt,
         alpha = 0.8)),
-    iterations = benchmark_iterations)
+    iterations = benchmark_iterations,
+    time_unit="ns")
 
 print("Bootstrap headcount")
 # headcount
@@ -117,7 +130,8 @@ benchmark_bootstrap_headcount <- bench::mark(benchmark_bootstrap_headcount = boo
     purrr::map_dbl(~headcount(v = df$dhi,
         z = wtd.quantile(df$dhi, df$hwgt, 0.5) * 0.6,
         w = df$hwgt)),
-    iterations = benchmark_iterations)
+    iterations = benchmark_iterations,
+    time_unit="ns")
 
 print("Bootstrap P Gap")
 # poverty gap
@@ -125,7 +139,8 @@ benchmark_bootstrap_poverty_gap <- bench::mark(benchmark_bootstrap_poverty_gap =
     purrr::map_dbl(~poverty_gap(v = df$dhi,
         z = wtd.quantile(df$dhi, df$hwgt, 0.5) * 0.6,
         w = df$hwgt)),
-    iterations = benchmark_iterations)
+    iterations = benchmark_iterations,
+    time_unit="ns")
 
 print("Bootstrap Watts")
 # watts
@@ -133,21 +148,24 @@ benchmark_bootstrap_watts <- bench::mark(benchmark_bootstrap_watts = bootstrap(d
     purrr::map_dbl(~watts(v = df$dhi,
         alpha = wtd.quantile(df$dhi, df$hwgt, 0.5) * 0.6,
         w = df$hwgt)),
-    iterations = benchmark_iterations)
+    iterations = benchmark_iterations,
+    time_unit="ns")
 
 print("Bootstrap Theil")
 # theil
 benchmark_bootstrap_theil <- bench::mark(benchmark_bootstrap_theil = bootstrap(df, bootstrap_n) %>%
     purrr::map_dbl(~dineq::theil.wtd(x = df$dhi,
         weights = df$hwgt)),
-    iterations = benchmark_iterations)
+    iterations = benchmark_iterations,
+    time_unit="ns")
 
 print("Bootstrap Mld")
 # mld
 benchmark_bootstrap_mld <- bench::mark(benchmark_bootstrap_mld = bootstrap(df, bootstrap_n) %>%
     purrr::map_dbl(~dineq::mld.wtd(x = df$dhi,
         weights = df$hwgt)),
-    iterations = benchmark_iterations)
+    iterations = benchmark_iterations,
+    time_unit="ns")
 
 
 # By groups ---------------------------------------------------------------
@@ -187,7 +205,8 @@ benchmark_bootstrap_grouped_mld <- bench::mark(benchmark_bootstrap_grouped_mld =
     purrr::map(~df_group %>%
                     group_by(htype) %>%
                     dplyr::summarise(estimate = dineq::mld.wtd(dhi, hwgt))),
-    iterations = benchmark_iterations)
+    iterations = benchmark_iterations,
+    time_unit="ns")
 
 
 benchmarks <- bind_rows(benchmark_gini,
