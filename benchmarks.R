@@ -190,7 +190,6 @@ benchmark_bootstrap_grouped_mld <- bench::mark(benchmark_bootstrap_grouped_mld =
     iterations = benchmark_iterations)
 
 
-
 benchmarks <- bind_rows(benchmark_gini,
     benchmark_atkinson_large_e,
     benchmark_atkinson_small_e,
