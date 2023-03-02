@@ -104,8 +104,6 @@ watts <- function(v, alpha, w = NULL){
 
 }
 
-watts(c(1:20), 7, seq(0.1, 2, 0.1))
-
 #' Produce bootstrap resamples
 #' 
 #' @description 
